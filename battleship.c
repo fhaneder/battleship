@@ -33,7 +33,7 @@ void _fehler(bool x)
 	if(x)
 	{	
 		char *clear = malloc(1000 * sizeof(char));		
-		scanf("%s",clear);
+		scanf("%999s",clear);
 		free(clear);
 	}
 	printf("Bitte gültige Eingabe vornehmen\n\n");
@@ -336,7 +336,7 @@ void anleitung()
 	printf("Wenn Sie dies verstanden haben,bestätigen Sie mit Enter\n");
 //Einfachste Methode, die mir eingefallen ist, eine Eingabe zu erzwingen	
 	char *c = malloc(1000 * sizeof(char));
-	scanf("%s",c);
+	scanf("%999s",c);
 	free(c);
 }
 
