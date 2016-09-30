@@ -39,6 +39,36 @@ void _fehler(bool x)
 	printf("Bitte gültige Eingabe vornehmen\n\n");
 }
 
+void _einFeldAusgeben(feld ausgabefeld[10][10])
+{
+	/* Gibt nur das Feld des aktuellen Spielers aus. Nur nötig zum Schiffe
+	 * setzen, daher werden nur die Fälle A und B abgefragt.
+	*/
+
+	for(int i=0; i<100; i++) printf("\n");
+	for(int i=0; i<11; i++)
+	{
+		printf("%d  ",i);
+	}
+	printf("\n");
+	for(int i=0; i<10; i++)
+	{
+		printf("%c  ",i+65);
+		for(int j=0; j<10; j++)
+		{
+			switch(ausgabefeld[i][j])
+			{
+				case C:
+				case D:
+				case A: printf("O  ");break;
+				case B: printf("|  ");break;
+			}
+		}
+		printf("\n");
+	}
+}
+
+
 bool _waagrecht(feld spielfeld[10][10], int x,int y, struct schiff *sptr)
 {
 	/* _waagrecht und _senkrecht sind Funktionen, die das jeweilige
@@ -189,6 +219,7 @@ void schiffeSetzen(feld player[10][10], struct schiff fleet[10])
 	int n = 0;
 	while(n<10) //läuft, solange Schiffe zu setzen sind, also n>0 ist.
 	{
+		_einFeldAusgeben(player);
 		if(_schiffeSetzen(player,&fleet[n])) n++;
 	}
 }
