@@ -246,7 +246,50 @@ unsigned int fleetCheck(struct schiff target[10])
 	return destroyed;
 }
 
-void feldAusgeben(){}
+void feldAusgeben(feld spieler[10][10], feld gegner[10][10])
+{
+	/* Gibt links das Feld des aktiven Spielers, rechts das des Gegners aus.
+	 * Zuvor wird das Terminal geleert, damit der Spieler nicht die Schiffe
+	 * des Gegners sehen kann.
+	*/
+
+	for(int i=0; i<100; i++) printf("\n");
+	for(int j=0; j<2; j++)
+	{	
+		for(int i=0; i<11; i++)
+		{
+			printf("%d  ",i);
+		}
+		printf("   ");
+	}
+	printf("\n");
+	for(int i=0; i<10; i++)
+	{
+		printf("%c  ",i+65);
+		for(int j=0; j<10; j++)
+		{
+			switch(spieler[i][j])
+			{
+				case A: printf("O  ");break;
+				case B: printf("|  ");break;
+				case C: printf("O  ");break;
+				case D: printf("X  ");break;
+			}
+		}
+		printf("    %c  ",i+65);
+		for(int j=0; j<10; j++)
+		{
+			switch(gegner[i][j])
+			{
+				case A: printf("O  ");break;
+				case B: printf("O  ");break;
+				case C: printf("/  ");break;
+				case D: printf("X  ");break;
+			}
+		}
+		printf("\n");
+	}
+}
 
 void anleitung()
 {
@@ -261,8 +304,8 @@ void anleitung()
 	printf("w und s bedeuten hierbei waagrecht und senkrecht. Der Großbuchstabe gibt die Zeile an, die Ganzzahl die Spalte. Während des Spiels ist die Position für Schüsse ebenso anzugeben. Andere Formate führen zu Fehlern und Sie werden dazu aufgefordert,eine gültige Position einzugeben\n");
 	printf("Wenn Sie dies verstanden haben,bestätigen Sie mit Enter\n");
 //Einfachste Methode, die mir eingefallen ist, eine Eingabe zu erzwingen	
-	char *c = malloc(1 * sizeof(char));
-	scanf("%c",c);
+	char *c = malloc(1000 * sizeof(char));
+	scanf("%s",c);
 	free(c);
 }
 
@@ -278,7 +321,7 @@ int main(void)
 			spieler2[i][j]=A; 
 		}
 	}
-	
+
 	int anzahlSchiffe1 = 10;
 	int anzahlSchiffe2 = 10;
 	struct schiff flotte1[10];		//Initialisieren der Flotten
@@ -334,14 +377,19 @@ int main(void)
 
 		failedShot1:
 		printf("Spieler 1\n");
+		feldAusgeben(spieler1,spieler2);
 		legalShot=schuss(spieler2,flotte2);
 		if(!legalShot) goto failedShot1;
 		anzahlSchiffe2=10-fleetCheck(flotte2);
 
 		failedShot2:
 		printf("Spieler 2\n");
+		feldAusgeben(spieler2,spieler1);
 		legalShot=schuss(spieler1,flotte1);
 		if(!legalShot) goto failedShot2;
 		anzahlSchiffe1=10-fleetCheck(flotte1);
 	}
+	
+	if(!anzahlSchiffe2) printf("Spieler 1 gewinnt!\n");
+	if(!anzahlSchiffe1) printf("Spieler 2 gewinnt!\n");
 }
