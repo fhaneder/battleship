@@ -1,6 +1,22 @@
+
+/* Dieses Programm ist ein Schiffe versenken für zwei Spieler. In der
+ * main-Funktion werden 5 Funktionen aufgerufen, die restlichen 6 sind
+ * "interne" Funktionen, die nur innerhalb von anderen Funktionen aufgerufen
+ * werden, und daher mit einem führenden "_" gekennzeichnet. Im Programm
+ * werden ein selbst definierter Datentyp "feld" und ein struct "schiff"
+ * verwendet. Darüber hinaus findet der UNIX-spezifische Befehl "sleep" 
+ * Einsatz, weshalb das Programm, um auf Windows zu laufen, zuerst
+ * entsprechend abgeändert werden muss.
+ * 
+ * Autor: Fabian Haneder
+ * Matrikelnummer: 1804221
+ * Note gewünscht: Ja
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 enum Feldart{A,B,C,D};
 typedef enum Feldart feld;
@@ -247,17 +263,20 @@ bool schuss(feld zielfeld[10][10], struct schiff zielflotte[10])
 		case C:
 			printf("Feld bereits beschossen!\n");
 			printf("Versuch's nochmal\n");
+			sleep(3);
 			return false;	//false bedeutet einen ungültigen Schuss
 		case B:
 			zielfeld[spalte-1][zeile-1]=D;
 			printf("Treffer\n");
 			_welchesSchiff(spalte-1,zeile-1,zielflotte);
 			printf("Geht das nochmal?\n");
+			sleep(3);
 			return schuss(zielfeld,zielflotte);
 //Treffer bedeutet, dass nochmal geschossen werden darf.
 		case A:
 			zielfeld[spalte-1][zeile-1]=C;
 			printf("Wasser\n");
+			sleep(3);
 			return true; //true bedeutet einen gültigen Schuss
 	}
 	return true;	//Dient dem selben Zweck wie in _schiffeSetzen
