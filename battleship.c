@@ -98,7 +98,7 @@ bool _waagrecht(feld spielfeld[10][10], int x,int y, struct schiff *sptr)
 	for(int i=0; i<s.length; i++)
 	{
 	//Prüft, ob ein Feld bereits besetzt ist oder man darüber hinaussetzt
-		if(spielfeld[y][x+i]==B || (x+s.length)>9) 
+		if(spielfeld[y][x+i]==B || (x+s.length)>10) 
 		{
 			_fehler(false);
 			return false;
@@ -112,6 +112,7 @@ bool _waagrecht(feld spielfeld[10][10], int x,int y, struct schiff *sptr)
 	s.startspalte=x;
 	s.startzeile=y;
 	s.richtung=true;
+	*sptr=s;
 	return true;
 }
 
@@ -121,7 +122,7 @@ bool _senkrecht(feld spielfeld[10][10], int x,int y, struct schiff *sptr)
 	struct schiff s=*sptr;
 	for(int i=0; i<s.length; i++)
 	{
-		if(spielfeld[y+i][x]==B || (y+s.length)>9)
+		if(spielfeld[y+i][x]==B || (y+s.length)>10)
 		{
 			_fehler(false);
 			return false;
@@ -134,6 +135,7 @@ bool _senkrecht(feld spielfeld[10][10], int x,int y, struct schiff *sptr)
 	s.startspalte=x;
 	s.startzeile=y;
 	s.richtung=false;
+	*sptr=s;
 	return true;
 }
 
@@ -257,7 +259,7 @@ bool schuss(feld zielfeld[10][10], struct schiff zielflotte[10])
 		_fehler(true);
 		return false;
 	}
-	switch(zielfeld[spalte-1][zeile-1])
+	switch(zielfeld[zeile-1][spalte-1])
 	{
 		case D:
 		case C:
@@ -266,7 +268,7 @@ bool schuss(feld zielfeld[10][10], struct schiff zielflotte[10])
 			sleep(3);
 			return false;	//false bedeutet einen ungültigen Schuss
 		case B:
-			zielfeld[spalte-1][zeile-1]=D;
+			zielfeld[zeile-1][spalte-1]=D;
 			printf("Treffer\n");
 			_welchesSchiff(spalte-1,zeile-1,zielflotte);
 			printf("Geht das nochmal?\n");
@@ -274,7 +276,7 @@ bool schuss(feld zielfeld[10][10], struct schiff zielflotte[10])
 			return schuss(zielfeld,zielflotte);
 //Treffer bedeutet, dass nochmal geschossen werden darf.
 		case A:
-			zielfeld[spalte-1][zeile-1]=C;
+			zielfeld[zeile-1][spalte-1]=C;
 			printf("Wasser\n");
 			sleep(3);
 			return true; //true bedeutet einen gültigen Schuss
@@ -351,7 +353,7 @@ void anleitung()
 
 	printf("Dies ist ein 'Schiffe versenken'-Spiel für zwei Spieler. Zu Anfang des Spiels werden Sie aufgefordert werden, Ihre Schiffe zu setzen, indem Sie Position und Richtung angeben. Nutzen Sie dazu folgendes Format:\n\n");
 	printf("A3 w bzw B5 s\n\n");
-	printf("w und s bedeuten hierbei waagrecht und senkrecht. Der Großbuchstabe gibt die Zeile an, die Ganzzahl die Spalte. Während des Spiels ist die Position für Schüsse ebenso anzugeben. Andere Formate führen zu Fehlern und Sie werden dazu aufgefordert,eine gültige Position einzugeben\n");
+	printf("w und s bedeuten hierbei waagrecht und senkrecht. Der Großbuchstabe gibt die Spalte an, die Ganzzahl die Zeile. Während des Spiels ist die Position für Schüsse ebenso anzugeben. Andere Formate führen zu Fehlern und Sie werden dazu aufgefordert,eine gültige Position einzugeben. Kleiner Bug: Das Spiel kann nach dem de facto Sieg eines Spielers erst beendet werden, wenn dieser nochmal daneben schießt ;)\n");
 	printf("Wenn Sie dies verstanden haben,bestätigen Sie mit Enter\n");
 //Einfachste Methode, die mir eingefallen ist, eine Eingabe zu erzwingen	
 	char *c = malloc(1000 * sizeof(char));
@@ -414,9 +416,7 @@ int main(void)
 */
 
 	anleitung();
-	printf("Spieler 1\n");
 	schiffeSetzen(spieler1,flotte1);
-	printf("Spieler 2\n");
 	schiffeSetzen(spieler2,flotte2);
 	bool legalShot;
 	while(anzahlSchiffe1 && anzahlSchiffe2)
@@ -426,18 +426,19 @@ int main(void)
 		*/
 
 		failedShot1:
-		printf("Spieler 1\n");
 		feldAusgeben(spieler1,spieler2);
 		legalShot=schuss(spieler2,flotte2);
-		if(!legalShot) goto failedShot1;
 		anzahlSchiffe2=10-fleetCheck(flotte2);
+		if(!anzahlSchiffe2) break;
+		if(!legalShot) goto failedShot1;
+		
 
 		failedShot2:
-		printf("Spieler 2\n");
 		feldAusgeben(spieler2,spieler1);
 		legalShot=schuss(spieler1,flotte1);
-		if(!legalShot) goto failedShot2;
 		anzahlSchiffe1=10-fleetCheck(flotte1);
+		if(!anzahlSchiffe1) break;
+		if(!legalShot) goto failedShot2;
 	}
 	
 	if(!anzahlSchiffe2) printf("Spieler 1 gewinnt!\n");
